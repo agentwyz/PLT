@@ -20,11 +20,11 @@ Js.log(interp(Add(Cst(2), Cst(3))))
 
 //因为需要将上面的语言使用到了宿主语言的栈
 
-//创建三个指令
+//创建三个指令,
 type instr = Cst(int) | Mul | Add
 
 //创建一个指令集
-type instrs = list<inter>
+type instrs = list<instr>
 
 //创建一个操作数
 type operand = int
@@ -36,11 +36,11 @@ type stack = list<operand>
 let rec eval = (instrs: instrs, stack: stack) => {
     switch (instrs, stack) {
     | (list{}, list{result}) => result
-    | (list{ Cst(int), ...rest}, _) => 
+    | (list{ Cst(i), ...rest}, _) => 
         eval(rest, list{i, ...stack})
     | (list{ Add, ...rest}, list{a, b, ...stack}) => 
         eval(rest, list{a + b, ...stack})
-    | (list{ Mul, ...rest}, list{a,b, ...stack}) => 
+    | (list{ Mul, ...rest}, list{a, b, ...stack}) => 
         eval(rest, list{a * b, ...stack})
     | _ => assert false
     }
