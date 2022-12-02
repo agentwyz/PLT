@@ -166,5 +166,29 @@ static void tokenize_error(Tokenize *t, const char *format, ...) {
         t->out->err_line = t->line;
         t->out->err_column = t->column;
     }
+
+    /*somthing not understand*/
+    va_list ap;
+    va_start(ap, format);
+    t->out->err = buf_vprintf(format, ap);
+    va_end(ap);
 }
+
+static void set_token_id(Tokenize *t, Token *token, TokenId id) {
+    token->id = id;
+
+    //创建
+    if (id == TokenIdIntLiteral) {
+        bigint_init_unsigned(&token->data.int_lit.bigint, 0);
+    } else {
+
+    }
+}
+
+//int sum(int, ...);
+
+
+
+
+
 
