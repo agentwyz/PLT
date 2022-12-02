@@ -21,3 +21,8 @@ function sq x -> 2 + sq x;;
 (*形成一个闭包*)
 let a = 1;;
 (function x -> x * a) 5;;
+
+(*函数递归*)
+let rec sigma x = if x = 0
+                    then 0
+                    else x + sigma(x - 1)
