@@ -1,7 +1,13 @@
-let imply v =
-    match v with
-    (true, true) -> true
-    | (true, false) -> false
+let a =
+    match not true with 
+    | true -> "nope" 
+    | false -> "yep";;
 
+let b =
+    match 42 with 
+    | foo -> foo;;
 
-type name 
+let z =
+    match "foo" with
+    | "bar" -> 0
+    | _ -> 1;;
