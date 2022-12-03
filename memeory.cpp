@@ -64,3 +64,28 @@ class shape_wrapper {
     private:
         shape* ptr_;
 };
+
+template <typename T>
+class smart_ptr {
+    public:
+        explict smart_ptr(T* ptr = nullptr)
+            : ptr_(ptr) {}
+        ~smart_ptr() {
+            delete ptr_;
+        }
+
+        /*
+        但是目前这个类的行为还是有一点问题的
+        1. 不可以使用*运算符号解引用
+        2. 不可以使用->运算符指向对象成员
+        3. 不可以像指针一样使用在布尔表达式中
+        */
+        T* get() const { return ptr_; }
+        T& operator* () const {return ptr_; }
+        operator bool() const {return ptr_; }
+    
+    private:
+        T* ptr_;
+};
+
+
