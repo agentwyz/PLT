@@ -9,13 +9,8 @@
 #include <errno.h>
 
 
-
-
 #define SYMBOL_CHAR \
     ALPHA_EXCEPT_C: \
-
-
-
 
 struct ZigKeyword {
     const char *text;
@@ -177,15 +172,39 @@ static void tokenize_error(Tokenize *t, const char *format, ...) {
 static void set_token_id(Tokenize *t, Token *token, TokenId id) {
     token->id = id;
 
-    //创建
-    if (id == TokenIdIntLiteral) {
+    if (id == TokenIdIntLiteral) {  //表示int整数字面量
         bigint_init_unsigned(&token->data.int_lit.bigint, 0);
-    } else {
-
+    } else if (id == TokenIdFloatLiteral) { //表示float字面量
+        bigfloat_init_32(&token->data.float_lit.bigfloat, 0.0f);
+        token->data.float_lit.overflow = false;
+    } else if (id == TokenIdStringLiteral || id == TokenIdSymbol) {
+        memset(&token->data.str_lit.str, 0, sizeof(Buf));
+        buf_resize(&token->data.str_lit, 0);
+        token->data.str_lit.is_c_str = false;
     }
 }
 
 //int sum(int, ...);
+static void begin_token(Tokenize *t, TokenId id) {
+    assert(!t->cur_tok);
+
+    t->tokens->add_one();
+    Token *token = &t->tokens->last();
+    token->start_line = t->line;
+    token->start_column = t->column;
+    token->start_pos = t->pos;
+
+    set_token_id(t, token, id);
+
+    t->cur_tok = token;
+}
+
+static void cancel_token(Tokenize* t) {
+    t->tokens->pop();
+    t->cur_tok = nullptr;
+}
+
+
 
 
 
