@@ -48,6 +48,9 @@ second (_, y, _) = y
 third :: (a, b, c) -> c
 third (_, _, c) = c
 
+---使用模式匹配进行匹配链表
+---
+
 
 bmiTell :: (RealFloat a) => a -> String
 bmiTell bmi
