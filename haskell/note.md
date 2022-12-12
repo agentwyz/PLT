@@ -44,5 +44,60 @@ circumference r = r * r
         (f 3)))
 ```
 
-上面这个函数会返回10
+上面这个函数会返回10, 这充分的说明了scheme是采用静态作用域的
 
+
+lambda calculus构造任何东西
+
+首先我们构造数
+```scheme
+
+```
+
+我们然后去构造函数
+
+## Y-combinator
+
+实现对函数的缓存
+
+```rescript
+let memofib = {
+    let cache = Hashtbl.create(100)
+    (n) => {
+        switch Hashtbl.find_opt() {
+            | some(x) => x
+            | None => {
+                let x = fib(n)
+                Hashtbl.replace(cache, n, x)
+                x
+            }
+        }
+    }
+}
+```
+
+使用open recisive
+```rescript
+let myfib = (myfib, n) => {
+    switch n {
+    | 0 | 1 => 1
+    | _ => myfib(n - 1) + myfib(n - 2)
+    }
+}
+
+let memo = anyFunc => {
+    let cache = Hashtbl.create(100)
+    let rec fix = (n) => {
+        switch Hashtabl.find_opt(cache, n) {
+        | Some(x) => x
+        | None => {
+            let x = anyFunc(fix, n)
+            Hashtbl.replace(cache, n, x)
+            x
+        }
+        }
+    }
+    fix
+}
+let memofib = memo(myfib)
+```
