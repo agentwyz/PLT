@@ -136,5 +136,22 @@ public class SimpleLexer {
         return newState;
     }
 
-    
+    private class SimpleTokenReader implements TokenReader {
+        List<Token> tokens = null;
+        int pos = 0;
+
+        //构造函数
+        public SimpleTokenReader(List<Token> tokens) {
+            this.tokens = tokens;
+        }
+
+        @Override
+
+    }
+
+    public SimpleTokenReader tokenize(String code) {
+
+    }
+
+
 }
