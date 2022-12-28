@@ -7,7 +7,7 @@ public class SimpleLexer {
     public static void main(String[] args) {
         SimpleLexer lexer = new SimpleLexer();
 
-        String script = "int aint = 3";
+        String script = "a = 3";
         System.out.println("parse: " + script);
 
         SimpleTokenReader tokenReader = lexer.tokenize(script);
@@ -109,6 +109,7 @@ public class SimpleLexer {
         } else if (isDigit(ch)) {
             newState = DfaState.IntLiteral;
             token.type = TokenType.IntLiteral;
+            tokenText.append(ch);
         } else if (ch == '>') {
             newState = DfaState.GT;
             token.type = TokenType.GT;
@@ -232,6 +233,7 @@ public class SimpleLexer {
                             state = initToken(ch);
                         }
                         break;
+                    case GE:
                     case Assignment:
                     case Plus:
                     case Minus:
@@ -295,6 +297,4 @@ public class SimpleLexer {
         }
         return new SimpleTokenReader(tokens);
     }
-
-
 }
