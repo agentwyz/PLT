@@ -46,6 +46,25 @@ public class SimpleLexer {
         IntLiteral
     }
 
+    private final class SimpleToken implements Token {
+        //token类型
+        private TokenType type = null;
+
+        //文本类型
+        private String text = null;
+
+        @Override
+        public TokenType getType() {
+            return type;
+        }
+
+        @Override
+        public String getText() {
+            return text;
+        }
+
+    }
+
     private StringBuffer tokenText = null;  //临时保存token的文本
     private List<Token> tokens = null;      //保存解析出来的token
     private SimpleToken token  = null;      //当前正在解析的token
@@ -81,7 +100,19 @@ public class SimpleLexer {
             tokenText.append(ch);
         } else if (ch == '+') {
             newState = DfaState.Plus;
-            token.type
+            token.type = TokenType.Plus;
+            tokenText.append(ch);
+        } else if (ch == '-') {
+            newState = DfaState.Minus;
+            token.type = TokenType.Minus;
+            tokenText.append(ch);
+        } else if (ch == '*') {
+            newState = DfaState.Star;
+            token.type = TokenType.Star;
+            tokenText.append(ch);
+        } else if (ch == '/') {
+            newState = DfaState.Slash;
+            token.type = TokenType.Slash;
         }
     }
 }
