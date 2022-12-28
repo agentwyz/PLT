@@ -146,11 +146,48 @@ public class SimpleLexer {
         }
 
         @Override
+        public Token read() {
+            if (pos < tokens.size()) {
+                return tokens.get(pos++);
+            }
+            return null;
+        }
 
+        @Override
+        public Token peek() {
+            if (pos < tokens.size()) {
+                return tokens.get(pos);
+            }
+            return null;
+        }
+
+        @Override
+        public void unread() {
+            if (pos > 0) {
+                pos--;
+            }
+        }
+
+        @Override
+        public int getPosition() {
+            return pos;
+        }
+
+        @Override
+        public void setPosition(int position) {
+            if (position >= 0 && position < tokens.size()) {
+                pos = position;
+            }
+        }
     }
 
     public SimpleTokenReader tokenize(String code) {
+        tokens = new ArrayList<Token>();
+        CharArrayReader reader = new CharArrayReader(code.toCharArray());
 
+        tokenText = new StringBuffer();
+        token = new SimpleToken();
+        
     }
 
 
