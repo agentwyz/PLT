@@ -2,6 +2,8 @@ public enum TokenType {
     Identifier,
     IntLiteral,
 
+    Int,
+
     Plus,   //+
     Minus,  //-
     Star,   //*

@@ -6,6 +6,21 @@ import java.util.List;
 public class SimpleLexer {
     public static void main(String[] args) {
         SimpleLexer lexer = new SimpleLexer();
+
+        String script = "int aint = 3";
+        System.out.println("parse: " + script);
+
+        SimpleTokenReader tokenReader = lexer.tokenize(script);
+        dump(tokenReader);
+    }
+
+    public static void dump(SimpleTokenReader tokenReader) {
+        System.out.println("text\ttype");
+        Token token = null;
+
+        while ((token = tokenReader.read()) != null) {
+            System.out.println(token.getText() + "\t\t" + token.getType());
+        }
     }
 
     private boolean isDigit(int ch) {
@@ -34,7 +49,7 @@ public class SimpleLexer {
         Int,
         Id_int1, Id_int2, Id_int3,
 
-        Id, GT, GE,
+        Id, GT, GE, EQ,
 
         Assignment,
 
@@ -187,7 +202,98 @@ public class SimpleLexer {
 
         tokenText = new StringBuffer();
         token = new SimpleToken();
-        
+
+        int ich = 0;
+        char ch = 0;
+
+        DfaState state = DfaState.Initial;
+
+        try {
+            //不断的去读
+            while ((ich = reader.read()) != -1) {
+                ch = (char) ich;
+                switch (state) {
+                    case Initial:
+                        state = initToken(ch);
+                        break;
+                    case Id:
+                        if (isAlpha(ch) || isDigit(ch)) {
+                            tokenText.append(ch);
+                        } else {
+                            state = initToken(ch);
+                        }
+                        break;
+                    case GT:
+                        if (ch == '=') {
+                            token.type = TokenType.GE;
+                            state = DfaState.GE;
+                            tokenText.append(ch);
+                        } else {
+                            state = initToken(ch);
+                        }
+                        break;
+                    case Assignment:
+                    case Plus:
+                    case Minus:
+                    case Star:
+                        state = initToken(ch);
+                        break;
+                    case Slash:
+                        state = initToken(ch);
+                        break;
+                    case SemiColon:
+                    case LeftParen:
+                    case RightParen:
+                        state = initToken(ch);
+                        break;
+                    case IntLiteral:
+                        if (isDigit(ch)) {
+                            tokenText.append(ch);
+                        } else {
+                            state = initToken(ch);
+                        }
+                        break;
+                    case Id_int1:
+                        if (ch == 'n') {
+                            state = DfaState.Id_int2;
+                            tokenText.append(ch);
+                        } else if (isDigit(ch) || isAlpha(ch)) {
+                            state = DfaState.Id;
+                            tokenText.append(ch);
+                        } else {
+                            state = initToken(ch);
+                        }
+                        break;
+                    case Id_int2:
+                        if (ch == 't') {
+                            state = DfaState.Id_int3;
+                            tokenText.append(ch);
+                        } else if (isDigit(ch) || isAlpha(ch)){
+                            state = DfaState.Id;
+                            tokenText.append(ch);
+                        } else {
+                            state = initToken(ch);
+                        }
+                        break;
+                    case Id_int3:
+                        if (isBlank(ch)) {
+                            token.type = TokenType.Int;
+                            state = initToken(ch);
+                        } else {
+                            state = DfaState.Id;
+                            tokenText.append(ch);
+                        }
+                        break;
+                    default:
+                }
+            }
+            if (tokenText.length() > 0) {
+                initToken(ch);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new SimpleTokenReader(tokens);
     }
 
 
