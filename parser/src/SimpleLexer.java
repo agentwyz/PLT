@@ -23,7 +23,7 @@ public class SimpleLexer {
     }
 
     private enum DfaState {
-        Inital,
+        Initial,
 
         If,
         Id_if1, Id_if2,
@@ -40,7 +40,7 @@ public class SimpleLexer {
 
         Plus, Minus, Star, Slash,
 
-        SemiColon,
+        SemiColon,  //表示分号;
         LeftParen, RightParen,
 
         IntLiteral
@@ -80,7 +80,7 @@ public class SimpleLexer {
             token = new SimpleToken();
         }
 
-        DfaState newState = DfaState.IntLiteral;
+        DfaState newState = DfaState.Initial;
 
         if (isAlpha(ch)) {
             //处理关键字
@@ -113,6 +113,28 @@ public class SimpleLexer {
         } else if (ch == '/') {
             newState = DfaState.Slash;
             token.type = TokenType.Slash;
+            tokenText.append(ch);
+        } else if (ch == ';') {
+            newState = DfaState.SemiColon;
+            token.type = TokenType.SemiColon;
+            tokenText.append(ch);
+        } else if (ch == '(') {
+            newState = DfaState.LeftParen;
+            token.type = TokenType.LeftParen;
+            tokenText.append(ch);
+        } else if (ch == ')') {
+            newState = DfaState.RightParen;
+            token.type = TokenType.RightParen;
+            tokenText.append(ch);
+        } else if (ch == '=') {
+            newState = DfaState.Assignment;
+            token.type = TokenType.Assignment;
+            tokenText.append(ch);
+        } else {
+            newState = DfaState.Initial;
         }
+        return newState;
     }
+
+    
 }

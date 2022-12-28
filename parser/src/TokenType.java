@@ -12,6 +12,9 @@ public enum TokenType {
     EQ,     // ==
     LE,     // <=
     LT,     // <
+    Assignment,
 
-
+    SemiColon, //分号;
+    LeftParen, //(
+    RightParen, //)
 }
