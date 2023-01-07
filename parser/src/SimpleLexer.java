@@ -7,7 +7,7 @@ public class SimpleLexer {
     public static void main(String[] args) {
         SimpleLexer lexer = new SimpleLexer();
 
-        String script = "a = 3";
+        String script = "int a = 3";
         System.out.println("parse: " + script);
 
         SimpleTokenReader tokenReader = lexer.tokenize(script);
