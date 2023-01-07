@@ -4,6 +4,9 @@ import java.util.List;
 
 public class SimpleCalculator {
     public static void main(String[] args) {
+        //测试变量声明语句
+        SimpleCalculator calculator = new SimpleCalculator();
+
 
     }
 
@@ -52,16 +55,16 @@ public class SimpleCalculator {
         }
 
     }
-    public static void intDeclare(TokenReader tokens) {
+    public void intDeclare(TokenReader tokens) throws Exception {
         SimpleASTNode node = null;
         Token token = tokens.peek();
 
         //IntDeclaration : Int Identifier ('=', additiveExpression)?;
         if (token.getType() == TokenType.Int) {
             token = tokens.read();
-            if (token.peek().getType() == TokenType.Identifier) {
+            if (tokens.peek().getType() == TokenType.Identifier) {
                 //create a node
-                node = new SimpleASTNode(ASTNodeType.IntDeclearation, token.getText());
+                node = new SimpleASTNode(ASTNodeType.IntDeclaration,, token.getText());
                 token = tokens.peek();
                 if (token.getType() == TokenType.Assignment) {
                     tokens.read();
@@ -75,6 +78,41 @@ public class SimpleCalculator {
             } else {
                 throw new Exception("Verible name expected");
             }
+        }
+    }
+
+    private SimpleASTNode additve(TokenReader tokens) throws Exception {
+        SimpleASTNode child1 = null;
+        SimpleASTNode node = child1;
+
+        Token token = tokens.peek();
+
+        if (token != null) {
+            if (token.getType() == TokenType.Plus
+                || token.getType() == TokenType.Minus) {
+
+                token = tokens.peek();
+                SimpleASTNode child2 = additve(tokens);
+
+                if (child2 != null) {
+                    node = new SimpleASTNode(ASTNodeType.Additive, token.getText());
+                    //node.addChild(child1);
+                    node.addChild(child2);
+                } else {
+                    throw new Exception("Invalid additive expression, expecting the right part");
+                }
+            }
+        }
+        return node;
+    }
+
+    //打印输出AST的树状结构
+    private void dumpAST(ASTNode node, String indent)
+    {
+        System.out.println(indent + node.getType() + " " + node.getText());
+
+        for (ASTNode child : node.getChildren()) {
+            dumpAST(child, indent + '\t');
         }
     }
 }
