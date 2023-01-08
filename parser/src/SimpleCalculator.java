@@ -14,11 +14,26 @@ public class SimpleCalculator {
         try {
             SimpleASTNode node = calculator.intDeclare(tokens);
             calculator.dumpAST(node, "");
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        //测试表达式
+        script = "2+3*5";
+        System.out.println("\n计算: " + script + "，看上去一切正常。");
+        calculator.evaluate(script);
+    }
+    //函数重载
+    public void evaluate(String script) {
+        try {
+            ASTNode tree = parse(script);
+            dumpAST(tree, "");
+            evaluate(tree, "");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
-
     private class SimpleASTNode implements ASTNode {
         SimpleASTNode parent = null;
         List<ASTNode> children = new ArrayList<ASTNode>();
@@ -149,18 +164,6 @@ public class SimpleCalculator {
        return node;
     }
 
-    //表示根节点
-    private SimpleASTNode prog(TokenReader tokens) throws Exception {
-        SimpleASTNode node = new SimpleASTNode(ASTNodeType.Programm, "Calculator");
-        SimpleASTNode child = additve(tokens);
-
-        if (child != null)
-        {
-            node.addChild(child);
-        }
-        return node;//创建一个节点
-    }
-
     //基础表达式
     private SimpleASTNode primary(TokenReader tokens) throws Exception {
         SimpleASTNode node = null;
@@ -191,13 +194,66 @@ public class SimpleCalculator {
         return node;
     }
 
+    //表示根节点
+    private SimpleASTNode prog(TokenReader tokens) throws Exception {
+        SimpleASTNode node = new SimpleASTNode(ASTNodeType.Programm, "Calculator");
+        SimpleASTNode child = additve(tokens);
+
+        if (child != null)
+        {
+            node.addChild(child);
+        }
+        return node;//创建一个节点
+    }
+
     //求值
     public ASTNode parse(String code) throws Exception {
         SimpleLexer lexer = new SimpleLexer();
         TokenReader tokens = lexer.tokenize(code);
 
         ASTNode rootNode = prog(tokens);
-        
+        return rootNode;
+    }
+
+    private int evaluate(ASTNode node, String indent)
+    {
+        int result = 0;
+        System.out.println(indent + "Calculating:" + node.getType());
+        switch (node.getType()) {
+            case Programm:
+                for (ASTNode child : node.getChildren()) {
+                    result = evaluate(child, indent + "\t");
+                }
+                break;
+            case Additive:
+                ASTNode child1 = node.getChildren().get(0);
+                int value1 = evaluate(child1, indent + "\t");
+                ASTNode child2 = node.getChildren().get(1);
+                int value2 = evaluate(child2, indent + "\t");
+                if (node.getText().equals("+")) {
+                    result = value1 + value2;
+                } else {
+                    result = value1 - value2;
+                }
+                break;
+            case Multiplicative:
+                child1 = node.getChildren().get(0);
+                value1 = evaluate(child1, indent + '\t');
+                child2 = node.getChildren().get(1);
+                value2 = evaluate(child2, indent + "\t");
+                if (node.getText().equals("*")) {
+                    result = value1 * value2;
+                } else {
+                    result = value1 / value2;
+                }
+                break;
+            case IntLiteral:
+                result = Integer.valueOf(node.getText()).intValue();
+                break;
+            default:
+        }
+        System.out.println(indent + "Result:" + result);
+        return result;
     }
 
     //解析脚本
