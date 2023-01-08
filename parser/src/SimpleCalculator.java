@@ -192,7 +192,13 @@ public class SimpleCalculator {
     }
 
     //求值
-    
+    public ASTNode parse(String code) throws Exception {
+        SimpleLexer lexer = new SimpleLexer();
+        TokenReader tokens = lexer.tokenize(code);
+
+        ASTNode rootNode = prog(tokens);
+        
+    }
 
     //解析脚本
     private void dumpAST(ASTNode node, String indent)
