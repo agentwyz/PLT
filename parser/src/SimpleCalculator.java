@@ -191,6 +191,9 @@ public class SimpleCalculator {
         return node;
     }
 
+    //求值
+    
+
     //解析脚本
     private void dumpAST(ASTNode node, String indent)
     {
