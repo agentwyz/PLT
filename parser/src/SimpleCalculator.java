@@ -6,7 +6,7 @@ public class SimpleCalculator {
     public static void main(String[] args) {
         //测试变量声明语句
         SimpleCalculator calculator = new SimpleCalculator();
-        String script = "int a = 3";
+        String script = "int a = 5 + 3 + 3;";
 
         SimpleLexer lexer = new SimpleLexer();
         TokenReader tokens = lexer.tokenize(script);
@@ -42,7 +42,7 @@ public class SimpleCalculator {
         //创建一个子节点
         @Override
         public List<ASTNode> getChildren() {
-            return children;
+            return readonlyChildren;
         }
 
         //AST类型
@@ -79,13 +79,13 @@ public class SimpleCalculator {
                     tokens.read();
                     SimpleASTNode child = additve(tokens);
                     if (child == null) {
-                        throw new Exception("Inva");
+                        throw new Exception("Invalid varible initialization, expecting an expression");
                     } else {
                         node.addChild(child);
                     }
                 }
             } else {
-                throw new Exception("invalide variable initialization, expecting an expression");
+                throw new Exception("variable name expected");
             }
 
             if (node != null) {
@@ -101,16 +101,15 @@ public class SimpleCalculator {
     }
 
     private SimpleASTNode additve(TokenReader tokens) throws Exception {
-        SimpleASTNode child1 = multiplicative(tokens); //;
+        SimpleASTNode child1 = multiplicative(tokens);
         SimpleASTNode node = child1;
 
         Token token = tokens.peek();
-
-        if (token != null) {
+        if (token != null && child1 != null) {
             if (token.getType() == TokenType.Plus
                 || token.getType() == TokenType.Minus) {
 
-                token = tokens.peek();
+                token = tokens.read();
                 SimpleASTNode child2 = additve(tokens);
 
                 if (child2 != null) {
@@ -133,7 +132,8 @@ public class SimpleCalculator {
         Token token = tokens.peek();
         if (child1 != null && token != null)
         {
-            if (token.getType() == TokenType.Star || token.getType() == TokenType.Slash)
+            if (token.getType() == TokenType.Star
+                    || token.getType() == TokenType.Slash)
             {
                 token = tokens.read();
                 SimpleASTNode child2 = multiplicative(tokens);
@@ -183,14 +183,15 @@ public class SimpleCalculator {
                 } else {
                     throw new Exception("expecting an additive expression inside parenthesis");
                 }
+            } else if (token.getType() == TokenType.Identifier) {
+                token = tokens.read();
+                node = new SimpleASTNode(ASTNodeType.Identifier, token.getText());
             }
         }
         return node;
     }
 
-
-
-
+    //解析脚本
     private void dumpAST(ASTNode node, String indent)
     {
         System.out.println(indent + node.getType() + " " + node.getText());
