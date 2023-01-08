@@ -66,37 +66,42 @@ public class SimpleCalculator {
     }
     public SimpleASTNode intDeclare(TokenReader tokens) throws Exception {
         SimpleASTNode node = null;
+        //返回下一个节点
         Token token = tokens.peek();
 
-        //IntDeclaration : Int Identifier ('=', additiveExpression)?;
-        if (token.getType() == TokenType.Int) {
-            token = tokens.read(); //int
-            //tokens=int,
+        if (token != null && token.getType() == TokenType.Int) {
+            token = tokens.read();
             if (tokens.peek().getType() == TokenType.Identifier) {
-                //create a node
-
-                node = new SimpleASTNode(ASTNodeType.IntDeclaration, token.getText());
-
-
-                tokens.read();
                 token = tokens.read();
-                System.out.println(token.getType());
-                if (token.getType() == TokenType.Assignment) {
-                    SimpleASTNode child = test(tokens);
-                    //System.out.println(child.text);
-                    node.addChild(child);
-
+                node = new SimpleASTNode(ASTNodeType.IntDeclaration, token.getText());
+                token = tokens.peek();
+                if (token != null && token.getType() == TokenType.Assignment) {
+                    tokens.read();
+                    SimpleASTNode child = additve(tokens);
+                    if (child == null) {
+                        throw new Exception("Inva");
+                    } else {
+                        node.addChild(child);
+                    }
                 }
             } else {
-                throw new Exception("Verible name expected");
+                throw new Exception("invalide variable initialization, expecting an expression");
+            }
+
+            if (node != null) {
+                token = tokens.peek();
+                if (token != null && token.getType() == TokenType.SemiColon) {
+                    tokens.read();
+                } else {
+                    throw new Exception("invalid statement, expecting semicoin");
+                }
             }
         }
-        //System.out.println(node.text);
         return node;
     }
 
     private SimpleASTNode additve(TokenReader tokens) throws Exception {
-        SimpleASTNode child1 = null; //multiplicative(tokens);
+        SimpleASTNode child1 = multiplicative(tokens); //;
         SimpleASTNode node = child1;
 
         Token token = tokens.peek();
@@ -121,22 +126,33 @@ public class SimpleCalculator {
     }
 
 
-    private SimpleASTNode test(TokenReader tokens) throws Exception {
-        //System.out.println(tokens.read().getText());
+    private SimpleASTNode multiplicative(TokenReader tokens) throws Exception {
         SimpleASTNode child1 = primary(tokens);
-        //System.out.println(child1.text);
-
         SimpleASTNode node = child1;
-        System.out.println(node.text);
 
-       //node.addChild(child1);
+        Token token = tokens.peek();
+        if (child1 != null && token != null)
+        {
+            if (token.getType() == TokenType.Star || token.getType() == TokenType.Slash)
+            {
+                token = tokens.read();
+                SimpleASTNode child2 = multiplicative(tokens);
+                if (child2 != null) {
+                    node = new SimpleASTNode(ASTNodeType.Multiplicative, token.getText());
+                    node.addChild(child1);
+                    node.addChild(child2);
+                } else {
+                    throw new Exception("invalid multiplicative expression, expecting the right part");
+                }
+            }
+        }
        return node;
     }
 
     //表示根节点
     private SimpleASTNode prog(TokenReader tokens) throws Exception {
         SimpleASTNode node = new SimpleASTNode(ASTNodeType.Programm, "Calculator");
-        SimpleASTNode child = test(tokens);
+        SimpleASTNode child = additve(tokens);
 
         if (child != null)
         {
@@ -148,24 +164,30 @@ public class SimpleCalculator {
     //基础表达式
     private SimpleASTNode primary(TokenReader tokens) throws Exception {
         SimpleASTNode node = null;
-        Token token = tokens.read();
-        //System.out.println(token.getText());
+        Token token = tokens.peek();
+
         if (token != null) {
-            System.out.println(token.getType());
             if (token.getType() == TokenType.IntLiteral) {
-                //System.out.println(token.getText());
-                //System.out.println(token.getText());
-                node = new SimpleASTNode(ASTNodeType.IntLiteral, token.getText());
-
-            } else if (token.getType() == TokenType.Identifier) {
                 token = tokens.read();
+                node = new SimpleASTNode(ASTNodeType.IntLiteral, token.getText());
             } else if (token.getType() == TokenType.LeftParen) {
-
+                tokens.read();
+                node = additve(tokens);
+                if (node != null) {
+                    token = tokens.peek();
+                    if (token != null && token.getType() == TokenType.RightParen) {
+                        tokens.read();
+                    } else {
+                        throw new Exception("expecting right parenthesus");
+                    }
+                } else {
+                    throw new Exception("expecting an additive expression inside parenthesis");
+                }
             }
         }
-        //System.out.println(node.text);
         return node;
     }
+
 
 
 
