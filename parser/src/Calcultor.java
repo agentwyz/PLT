@@ -84,7 +84,7 @@ class Calculator {
         //返回下一个节点
         Token token = tokens.peek();
 
-        if (token != null && token.getType() == TokenType.Int) { 
+        if (token != null && token.getType() == TokenType.Int) {
             token = tokens.read();
             if (tokens.peek().getType() == TokenType.Identifier) {
                 token = tokens.read();
@@ -202,7 +202,51 @@ class Calculator {
         }
         return node;//创建一个节点
     }
+    private SimpleASTNode assignmentStatement(TokenReader tokens) throws Exception {
+        SimpleASTNode node = null;
 
+        Token token = tokens.peek();    //首先读入identfier
+        if (token != null && token.getType() == TokenType.Identifier) {
+            token = tokens.read();      //消耗掉int
+            node = new SimpleASTNode(ASTNodeType.AssignmentStmt, token.getText());
+            token = tokens.peek();
+            if (token != null && token.getType() == TokenType.Assignment) {
+                tokens.read();
+                SimpleASTNode child = additve(tokens);
+                if (child == null) {
+                    throw new Exception("invalide assignment statemnet, expecting an expression");
+                } else {
+                    node.addChild(child);
+                    token = tokens.peek();
+                    if (token != null && token.getType() == TokenType.SemiColon) {
+                        tokens.read();
+                    } else {
+                        throw new Exception("Invalid statement. expecting semicolon");
+                    }
+                }
+            } else {
+                tokens.unread();
+                node = null;
+            }
+        }
+        return node;
+    }
+
+    private SimpleASTNode expressionStatement(TokenReader tokens) throws Exception {
+        int pos = tokens.getPosition();     //记下初始位置
+        SimpleASTNode node = additve(tokens);//匹配加法规则
+
+        if (node != null) {
+            Token token = tokens.peek();
+            if (token != null && token.getType() == TokenType.SemiColon) { //要
+                tokens.read();
+            } else {
+                node = null;
+                tokens.setPosition(pos);
+            }
+        }
+        return node;
+    }
     //求值
     public ASTNode parse(String code) throws Exception {
         SimpleLexer lexer = new SimpleLexer();

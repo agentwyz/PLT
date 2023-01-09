@@ -196,6 +196,37 @@ public class SimpleCalculator {
         return node;
     }
 
+    private SimpleASTNode assignmentStatement(TokenReader tokens) throws Exception {
+        SimpleASTNode node = null;
+
+        Token token = tokens.peek();
+        if (token != null && token.getType() == TokenType.Identifier) {
+            token = tokens.read();  //读入标识符
+            node = new SimpleASTNode(ASTNodeType.AssignmentStmt, token.getText());
+            token = tokens.peek();
+            if (token != null && token.getType() == TokenType.Assignment) {
+                tokens.read();
+                SimpleASTNode child = additve(tokens);
+                if (child == null) {
+                    throw new Exception("invalide assignment statemnet, expecting an expression");
+                } else {
+                    node.addChild(child);
+                    token = tokens.peek();
+                    if (token != null && token.getType() == TokenType.SemiColon) {
+                        tokens.read();
+                    } else {
+                        throw new Exception("Invalid statement. expecting semicolon");
+                    }
+                }
+            } else {
+                tokens.unread();
+                node = null;
+            }
+        }
+        return node;
+    }
+
+
     //表示根节点
     private SimpleASTNode prog(TokenReader tokens) throws Exception {
         SimpleASTNode node = new SimpleASTNode(ASTNodeType.Programm, "Calculator");
