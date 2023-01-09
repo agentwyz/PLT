@@ -2,18 +2,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SimpleCalculator {
+class Calculator {
     public static void main(String[] args) {
         //测试变量声明语句
-        SimpleCalculator calculator = new SimpleCalculator();
-        String script = "int a = 5 + 2 * 3;";
+        Calculator calculator1 = new Calculator();
+        String script = "int a = 5 + 2 + 3;";
 
         SimpleLexer lexer = new SimpleLexer();
         TokenReader tokens = lexer.tokenize(script);
 
         try {
-            SimpleASTNode node = calculator.intDeclare(tokens);
-            calculator.dumpAST(node, "");
+            SimpleASTNode node = calculator1.intDeclare(tokens);
+            calculator1.dumpAST(node, "");
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -22,7 +22,7 @@ public class SimpleCalculator {
         //测试表达式
         script = "2+3*5";
         System.out.println("\n计算: " + script + "，看上去一切正常。");
-        calculator.evaluate(script);
+        calculator1.evaluate(script);
     }
     //函数重载
     public void evaluate(String script) {
@@ -84,7 +84,7 @@ public class SimpleCalculator {
         //返回下一个节点
         Token token = tokens.peek();
 
-        if (token != null && token.getType() == TokenType.Int) { //
+        if (token != null && token.getType() == TokenType.Int) { 
             token = tokens.read();
             if (tokens.peek().getType() == TokenType.Identifier) {
                 token = tokens.read();
@@ -116,25 +116,20 @@ public class SimpleCalculator {
     }
 
     private SimpleASTNode additve(TokenReader tokens) throws Exception {
-        SimpleASTNode child1 = multiplicative(tokens);//2+3*4
+        SimpleASTNode child1 = multiplicative(tokens);
         SimpleASTNode node = child1;
-
-        Token token = tokens.peek();//首先看一看是不是加号
-        //注意看这里
-        if (token != null && child1 != null) {
-            if (token.getType() == TokenType.Plus //然后匹配加号
-                || token.getType() == TokenType.Minus) {
-                //然后进行读取
-                token = tokens.read();
-
-                SimpleASTNode child2 = additve(tokens); //然后又再次进行匹配
-
-                if (child2 != null) {
+        if (child1 != null) {
+            while (true) {
+                Token token = tokens.peek();
+                if (token != null && (token.getType() == TokenType.Plus || token.getType() == TokenType.Minus)) {
+                    token = tokens.read();
+                    SimpleASTNode child2 = multiplicative(tokens);
                     node = new SimpleASTNode(ASTNodeType.Additive, token.getText());
                     node.addChild(child1);
                     node.addChild(child2);
+                    child1 = node;
                 } else {
-                    throw new Exception("Invalid additive expression, expecting the right part");
+                    break;
                 }
             }
         }
@@ -163,7 +158,7 @@ public class SimpleCalculator {
                 }
             }
         }
-       return node;
+        return node;
     }
 
     //基础表达式
